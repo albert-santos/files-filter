@@ -1,1 +1,142 @@
-# files-filter
+# 📄 RSMA Document Filter and PDF Merger
+
+## 1. Overview
+
+This project implements an **automated Python pipeline** to:
+
+- Read **PDF, XLSX, and PPTX** files compressed in a `.zip` archive;
+- Automatically identify documents related to **Rate-Splitting Multiple Access (RSMA)**;
+- Consider **terminological variations** of RSMA in both **file names** and **document content**;
+- Filter only RSMA-related documents;
+- Convert **XLSX** and **PPTX** files to **PDF** on **Windows** systems;
+- Merge all RSMA-related PDFs into **a single final PDF file**.
+
+
+---
+
+## 2. Requirements & Installation
+
+### 2.1. Python Dependencies
+Ensure you have Python 3.x installed. Install the required libraries using:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2.2. LibreOffice (Critical)
+For the conversion of Microsoft Office files (Excel, PowerPoint, Word) to PDF, **LibreOffice** is required.
+
+- ⚠️ **The code expects LibreOffice to be installed at:**
+  `C:\Program Files\LibreOffice\program\soffice.exe`
+
+- 📥 **Download:**
+  Please download and install LibreOffice from the official website: [https://www.libreoffice.org/download/download-libreoffice/](https://www.libreoffice.org/download/download-libreoffice/)
+
+---
+
+## 3. How to Use
+
+### 3.1. Input Data (`input.zip`)
+1.  Compress all your source documents into a file named **`input.zip`**.
+2.  Place `input.zip` in the **root directory** of the project (alongside `main.py`).
+
+**Note on Organization:**
+- The internal structure of the `input.zip` **does not matter**.
+- The script recursively searches for files in all subdirectories.
+- **Nested ZIPs supported:** If your `input.zip` contains other `.zip` files inside, the script will automatically extract them and process their contents recursively.
+
+### 3.2. Running the Script
+Execute the main script via terminal:
+
+```bash
+python main.py
+```
+
+### 3.3. Output
+After execution, check the `workspace/output` folder:
+- **`RSMA_final.pdf`**: One single PDF containing all merged RSMA-related documents.
+- **`RSMA_pdfs.zip`**: A zip file containing individual PDFs of the identified documents.
+- **`progress.json`**: A summary of the processing stats.
+
+---
+
+## 4. Features
+
+- ✔ Automatic extraction of files from a `.zip` archive (recursive)
+- ✔ Content analysis of:
+  - PDFs (`pdfplumber`)
+  - Excel spreadsheets (`pandas`, `openpyxl`)
+  - PowerPoint presentations (`python-pptx`)
+- ✔ RSMA detection using robust regular expressions
+- ✔ Conversion of Office documents to PDF using **LibreOffice (headless mode)**
+- ✔ Merging multiple PDFs into a single document
+- ✔ Modular and maintainable code structure
+
+---
+
+## 5. Project Structure
+
+```text
+project/
+├── requirements.txt         # Python dependencies
+├── main.py              # Main script
+├── input.zip            # Your input data (must be present)
+├── workspace/           # Created during execution
+│   ├── extracted/       # Unzipped files
+│   ├── filtered_rsma/   # Files identified as RSMA
+│   ├── converted_pdf/   # Intermediate PDFs
+│   └── output/          # Final results
+└── README.md
+```
+
+---
+
+## 6. Customizing Search Themes
+
+The script searches for files and content that match the patterns defined in the `RSMA_PATTERNS` variable within the `main.py` file.
+
+To **change the search theme** to another subject (e.g., "Artificial Intelligence", "Blockchain", etc.), follow the steps below:
+
+### 6.1. Where to Modify the Code
+
+1.  Open the **`main.py`** file in a text editor or IDE (such as VS Code, PyCharm, or Notepad).
+2.  Locate the **`PADRÕES RSMA`** section (around line 48).
+3.  You will see a list named `RSMA_PATTERNS`:
+
+```python
+RSMA_PATTERNS = [
+    r"\brsma\b",
+    r"rate[\s\-]?splitting",
+    r"rate[\s\-]?splitting[\s\-]?multiple[\s\-]?access",
+    r"rate[\s\-]?splitting[\s\-]?ma"
+]
+```
+
+4.  Replace the items in this list with the terms for your new theme.
+
+### 6.2. Generating New Patterns with AI (Recommended)
+
+To ensure the search captures variations (singular/plural, with/without hyphen, uppercase/lowercase), it is recommended to use **Regular Expressions (Regex)** patterns.
+
+You can ask an AI (ChatGPT, Claude, Gemini, Copilot) to generate this list for you.
+
+**Copy and paste the following prompt into the AI:**
+
+> "I have a Python script that uses regular expressions (regex) to filter text files.
+>
+> I need to replace the current theme with: **[INSERT YOUR NEW THEME HERE]**.
+>
+> Generate a Python list named `RSMA_PATTERNS` containing raw strings (`r"..."`) with regex to capture this theme and its common variations (acronyms, plurals, hyphens, optional spaces).
+>
+> The response must contain **only** the list code, ready to copy and paste, like this:
+>
+> ```python
+> RSMA_PATTERNS = [
+>     r"pattern1",
+>     r"pattern2",
+>     # ...
+> ]
+> ```"
+
+5.  Copy the code generated by the AI and replace the original `RSMA_PATTERNS` list in the `main.py` file.
+
